@@ -1,3 +1,9 @@
+/**
+ * @file deploy-commands.js
+ * @description Script independiente para registrar los comandos slash en la API de Discord.
+ * Debe ejecutarse cada vez que se añadan o modifiquen comandos.
+ */
+
 import { REST, Routes } from 'discord.js';
 import 'dotenv/config';
 import fs from 'node:fs';
@@ -26,17 +32,20 @@ for (const folder of commandFolders) {
 
 const rest = new REST().setToken(process.env.TOKEN);
 
+/**
+ * Función autoejecutable para registrar los comandos globales.
+ */
 (async () => {
     try {
-        console.log(`Iniciando el refresco de ${commands.length} comandos (/).`);
+        console.log(`[REST] Iniciando actualización de ${commands.length} comandos slash registrados globalmente.`);
 
         const data = await rest.put(
             Routes.applicationCommands(process.env.CLIENT_ID),
             { body: commands },
         );
 
-        console.log(`¡Éxito! Se registraron ${data.length} comandos (/).`);
+        console.log(`[REST] Operación completada: ${data.length} comandos sincronizados correctamente.`);
     } catch (error) {
-        console.error(error);
+        console.error('[Error] Fallo en la sincronización de comandos:', error);
     }
 })();

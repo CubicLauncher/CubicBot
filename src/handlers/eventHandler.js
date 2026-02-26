@@ -1,16 +1,24 @@
+/**
+ * @module EventHandler
+ * @description Gestiona la carga dinámica de archivos de eventos desde el directorio /events.
+ */
+
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Carga de forma recursiva todos los eventos definidos en la carpeta de eventos.
+ * @param {import('discord.js').Client} client El cliente de Discord.
+ */
 export async function loadEvents(client) {
     const eventsPath = path.join(__dirname, '../events');
     const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
     for (const file of eventFiles) {
         const filePath = path.join(eventsPath, file);
-        // We use a relative path from the current file or absolute path
         const event = (await import(`file://${filePath}`)).default;
 
         if (event.once) {
@@ -20,5 +28,5 @@ export async function loadEvents(client) {
         }
     }
 
-    console.log(`[Handler] Cuidado, se han cargado ${eventFiles.length} eventos.`);
+    console.log(`[Handler] Registro completo: ${eventFiles.length} eventos cargados.`);
 }

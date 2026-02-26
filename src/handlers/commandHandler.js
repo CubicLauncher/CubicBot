@@ -1,14 +1,21 @@
+/**
+ * @module CommandHandler
+ * @description Escanea y carga comandos slash desde las subcarpetas del directorio /commands.
+ */
+
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Carga todos los comandos slash y los registra en la colección del cliente.
+ * @param {import('discord.js').Client} client El cliente de Discord.
+ */
 export async function loadCommands(client) {
     const commandsPath = path.join(__dirname, '../commands');
     const commandFolders = fs.readdirSync(commandsPath);
-
-    let commandsArray = [];
 
     for (const folder of commandFolders) {
         const folderPath = path.join(commandsPath, folder);
@@ -22,15 +29,11 @@ export async function loadCommands(client) {
 
             if ('data' in command && 'execute' in command) {
                 client.commands.set(command.data.name, command);
-                commandsArray.push(command.data.toJSON());
             } else {
-                console.warn(`[WARNING] El comando en ${filePath} no tiene la estructura requerida.`);
+                console.warn(`[Aviso] Estructura inválida en el comando: ${filePath}`);
             }
         }
     }
 
-    // Opcional: Registrar los comandos en la API de Discord
-    // Esto se puede hacer en un archivo separado o aquí mismo si es sencillo.
-    // Por ahora solo los cargamos en la colección.
-    console.log(`[Handler] ¡Listo! Se han cargado ${client.commands.size} comandos.`);
+    console.log(`[Handler] Sistema preparado: ${client.commands.size} comandos registrados.`);
 }
